@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:slsa.dev)",
+      "Bash(pip install:*)",
+      "Bash(python -m app.mapping.run_mapping)"
+    ]
+  }
+}
