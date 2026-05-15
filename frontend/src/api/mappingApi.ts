@@ -27,12 +27,42 @@ export interface OWASPControl {
   level: number
 }
 
+export interface SOC2Control {
+  id: string
+  control_ref: string
+  category: string
+  requirement: string
+  description: string
+  priority: string
+}
+
+export interface GDPRControl {
+  id: string
+  control_ref: string
+  category: string
+  requirement: string
+  description: string
+  priority: string
+}
+
+export interface ISO27001Control {
+  id: string
+  control_ref: string
+  category: string
+  requirement: string
+  description: string
+  priority: string
+}
+
 export interface MappedDomain {
   key: string
   label: string
   description: string
   slsa_controls: SLSAControl[]
   owasp_controls: OWASPControl[]
+  soc2_controls: SOC2Control[]
+  gdpr_controls: GDPRControl[]
+  iso27001_controls: ISO27001Control[]
 }
 
 export interface CompareResponse {
@@ -40,6 +70,9 @@ export interface CompareResponse {
   domain_count: number
   total_slsa_controls: number
   total_owasp_controls: number
+  total_soc2_controls: number
+  total_gdpr_controls: number
+  total_iso27001_controls: number
   domains: MappedDomain[]
 }
 

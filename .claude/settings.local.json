@@ -3,7 +3,17 @@
     "allow": [
       "WebFetch(domain:slsa.dev)",
       "Bash(pip install:*)",
-      "Bash(python -m app.mapping.run_mapping)"
+      "Bash(python -m app.mapping.run_mapping)",
+      "Bash(npm run *)",
+      "Bash(curl -s -X POST http://localhost:8000/api/mapping/compare -H 'Content-Type: application/json' -d '{\"datasets\":[\"soc2\",\"iso27001\"]}')",
+      "Bash(python3 -c ' *)",
+      "Bash(python3 *)",
+      "Bash(.venv/bin/python -m app.mapping.run_mapping)",
+      "Bash(curl -s -X POST http://localhost:8000/api/mapping/compare -H 'Content-Type: application/json' -d '{\"datasets\":[\"soc2\",\"gdpr\",\"iso27001\"]}')",
+      "Bash(npm --version)",
+      "Bash(chmod +x *)",
+      "Bash(bash dev.sh)",
+      "Bash(bash dev.sh --remap)"
     ]
   }
 }

@@ -41,6 +41,9 @@ def main() -> None:
     print(f"  Domains    : {mapping.domain_count}")
     print(f"  SLSA items : {mapping.slsa_control_count}")
     print(f"  OWASP reqs : {mapping.owasp_control_count}")
+    print(f"  SOC 2      : {mapping.soc2_control_count}")
+    print(f"  GDPR       : {mapping.gdpr_control_count}")
+    print(f"  ISO 27001  : {mapping.iso27001_control_count}")
     print(f"  Output     : {OUTPUT_FILE.resolve()}")
 
 

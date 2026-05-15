@@ -1,0 +1,19 @@
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+.venv/
+
+# Logs
+*.log
+.backend.log
+.frontend.log
+
+# OS
+.DS_Store
+Thumbs.db
