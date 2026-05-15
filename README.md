@@ -1,14 +1,26 @@
 # CriteriaMeter
 
-CriteriaMeter is a local-first web application for assessing software supply-chain security posture. It maps controls from two security frameworks — **SLSA v1.2** (Supply-chain Levels for Software Artifacts) and **OWASP ASVS 5.0** (Application Security Verification Standard) — across 8 shared security domains, and provides an interactive compliance checklist for tracking SLSA Build Track progress.
+CriteriaMeter is a local-first web application for assessing software supply-chain security and compliance posture. It maps controls from five security frameworks across 18 shared domains and provides interactive checklists for tracking progress.
 
-## Features
+## Frameworks
+
+| Framework | Type | Controls |
+|-----------|------|----------|
+| **SLSA v1.2** (Supply-chain Levels for Software Artifacts) | Supply-chain security | 26 |
+| **OWASP ASVS 5.0** (Application Security Verification Standard) | Application security | 208 |
+| **SOC 2** (AICPA Trust Services Criteria) | Compliance | 51 |
+| **GDPR** (EU General Data Protection Regulation) | Compliance | 46 |
+| **ISO 27001:2022** (Information Security Management) | Compliance | 116 |
+
+## Pages
 
 | Page | Description |
 |------|-------------|
-| **Meter Reading** | Interactive SLSA v1.2 Build Track checklist with per-level progress tracking (L1 → L2 → L3) |
-| **Mapper** | Cross-framework control comparison — select SLSA v1.2, OWASP ASVS 5.0, or both to see how controls align across 8 security domains |
-| **Dashboard** | Aggregated compliance overview (in development) |
+| **Dashboard** | Heat-map overview of control coverage across all frameworks and domains |
+| **Meter Reading › Supply Chain** | Interactive SLSA v1.2 Build Track checklist with per-level progress tracking (L1 → L2 → L3) |
+| **Meter Reading › Compliance** | Live API-backed checklist for SOC 2, GDPR, and ISO 27001:2022 controls with per-framework progress |
+| **Mapper › Supply Chain** | Cross-framework side-by-side comparison of SLSA v1.2 and OWASP ASVS 5.0 controls by domain |
+| **Mapper › Compliance** | Cross-framework side-by-side comparison of SOC 2, GDPR, and ISO 27001:2022 controls by domain |
 
 ## Tech Stack
 
@@ -18,16 +30,66 @@ CriteriaMeter is a local-first web application for assessing software supply-cha
 
 ---
 
-## Deployment
+## Quickstart (local development)
 
-### Option 1 — Docker (recommended)
+The `dev.sh` script handles environment setup, dependency installation, and starts both servers.
 
-Both services have individual Dockerfiles. Build and run them in order.
+```bash
+chmod +x dev.sh
+./dev.sh
+```
+
+Pass `--remap` to regenerate the unified control mapping before starting:
+
+```bash
+./dev.sh --remap
+```
+
+Open http://localhost:3000 once both servers are ready.
+
+To stop both servers:
+
+```bash
+pkill -f uvicorn; pkill -f vite
+```
+
+---
+
+## Manual local development
+
+Prerequisites: Python 3.12+, Node 20+
+
+**Backend**
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+# Runs at http://localhost:8000
+```
+
+**Frontend** (in a separate terminal)
+
+```bash
+cd frontend
+npm install
+npm run dev
+# Runs at http://localhost:3000
+```
+
+The Vite dev server automatically proxies all `/api/*` requests to `http://localhost:8000`, so no CORS configuration is needed during local development.
+
+---
+
+## Docker deployment
+
+Both services have individual Dockerfiles.
 
 **1. Build the images**
 
 ```bash
-# From the project root
 docker build -t criteriameter-backend ./backend
 docker build -t criteriameter-frontend ./frontend
 ```
@@ -66,42 +128,10 @@ docker run -d \
 
 | Service | URL |
 |---------|-----|
-| Frontend (React app) | http://localhost:3000 |
+| Frontend | http://localhost:3000 |
 | Backend API | http://localhost:8000 |
-| API health check | http://localhost:8000/health |
+| Health check | http://localhost:8000/health |
 | API docs (Swagger) | http://localhost:8000/docs |
-
----
-
-### Option 2 — Local development (no Docker)
-
-Prerequisites: Python 3.12+, Node 20+
-
-**Backend**
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-# Runs at http://localhost:8000
-```
-
-**Frontend** (in a separate terminal)
-
-```bash
-cd frontend
-npm install
-npm run dev
-# Runs at http://localhost:3000
-```
-
-The Vite dev server automatically proxies all `/api/*` requests to `http://localhost:8000`, so no CORS configuration is needed during local development.
-
-**Access in the browser**
-
-Open http://localhost:3000 — the full application is available at this single address.
 
 ---
 
@@ -110,6 +140,21 @@ Open http://localhost:3000 — the full application is available at this single 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CRITERIAMETER_ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated list of allowed CORS origins |
+
+---
+
+## Dataset files
+
+Reference files and compliance datasets live under `dataset/` at the project root. The backend reads these at startup; mount the directory as a read-only volume in Docker.
+
+| File | Description |
+|------|-------------|
+| `checklist_SLSAv1.2.txt` | SLSA v1.2 Build Track checklist (plain text) |
+| `OWASP_Application_Security_Verification_Standard_5.0.0_en.csv` | OWASP ASVS 5.0 requirements |
+| `soc2_checklist.csv` | SOC 2 Trust Services Criteria |
+| `gdpr_checklist.csv` | GDPR requirements |
+| `iso27001_checklist.csv` | ISO 27001:2022 controls |
+| `reference.md` | Links to upstream specs |
 
 ---
 
@@ -124,3 +169,9 @@ python -m app.mapping.run_mapping
 ```
 
 Edit `backend/app/mapping/domains.py` to change how controls are assigned to domains without touching loader or mapper logic.
+
+The 18 control domains span two groups:
+
+**Technical** — `build_process_integrity`, `provenance_and_traceability`, `cryptography_and_signing`, `secret_management`, `build_isolation`, `dependency_management`, `access_control_and_authorization`, `audit_logging`
+
+**Compliance** — `comp_governance`, `comp_risk`, `comp_access_control`, `comp_data_protection`, `comp_security_ops`, `comp_physical`, `comp_vendor`, `comp_incident`, `comp_audit`, `comp_continuity`
