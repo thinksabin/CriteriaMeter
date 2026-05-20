@@ -182,3 +182,7 @@ These controls become necessary when the corresponding infrastructure is added:
 - One frontend app
 - In Memory database to create chart and dashboard
 - End-to-end ingestion and visualization test
+
+## Dashboard
+
+- Heatmap per compliance items mentioned in dataset/reference.md

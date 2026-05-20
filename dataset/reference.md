@@ -4,3 +4,12 @@
 
 # OWASP ASVS
 - OWASP_Application_Security_Verification_Standard_5.0.0_en.csv
+
+# ISO 27001
+- iso27001_checklist.csv
+
+# GDPR
+- gdpr_checklist.csv
+
+# SOC2
+- soc2_checklist.csv
