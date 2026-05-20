@@ -24,9 +24,9 @@ CriteriaMeter is a local-first web application for assessing software supply-cha
 
 ## Tech Stack
 
-- **Backend:** Python 3.12, FastAPI, Pydantic v2
+- **Backend:** Python 3.12, FastAPI, Pydantic v2, SQLAlchemy 2.x
 - **Frontend:** React 18, TypeScript, Vite, served by nginx in production
-- **Storage:** Pre-computed JSON mapping (no database required for current features)
+- **Storage:** SQLite (local default) or PostgreSQL (production); pre-computed JSON mapping for control data
 
 ---
 
@@ -108,11 +108,14 @@ docker run -d \
   --network criteriameter \
   -p 8000:8000 \
   -v "$(pwd)/dataset:/dataset:ro" \
+  -v "$(pwd)/backend:/data" \
   -e CRITERIAMETER_ALLOWED_ORIGINS=http://localhost:3000 \
+  -e CRITERIAMETER_DATABASE_URL=sqlite:////data/criteriameter.db \
   criteriameter-backend
 ```
 
 > The `dataset/` volume mount is required — the backend reads compliance data from it at startup.
+> The `/data` volume persists the SQLite database file across container restarts. For production, set `CRITERIAMETER_DATABASE_URL` to a PostgreSQL connection string instead.
 
 **4. Run the frontend**
 
@@ -140,6 +143,7 @@ docker run -d \
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CRITERIAMETER_ALLOWED_ORIGINS` | `http://localhost:3000` | Comma-separated list of allowed CORS origins |
+| `CRITERIAMETER_DATABASE_URL` | `sqlite:///./criteriameter.db` | SQLAlchemy database URL. Use `postgresql://user:pass@host:5432/dbname` for PostgreSQL |
 
 ---
 
