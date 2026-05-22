@@ -11,7 +11,7 @@ When writing a commit message:
 4. Commit messages should be in past tense.
 
 ## What
-One sentence explaining what this PR does.
+One sentence explaining the changes made in the past tense.
 
 ## Why
 Brief context on why this change is needed
@@ -20,3 +20,4 @@ Brief context on why this change is needed
 - Bullet points of specific changes made
 - Group related changes together
 - Mention any files deleted or renamed
+- Do not include co-author information in the commit message.
