@@ -10,6 +10,7 @@ BACKEND_DIR="$SCRIPT_DIR/backend"
 FRONTEND_DIR="$SCRIPT_DIR/frontend"
 BACKEND_LOG="$SCRIPT_DIR/.backend.log"
 FRONTEND_LOG="$SCRIPT_DIR/.frontend.log"
+# Ports default here; overridden from config.yml after the venv is ready (see Step 2)
 BACKEND_PORT=8000
 FRONTEND_PORT=3000
 REMAP=false
@@ -59,6 +60,21 @@ fi
 
 info "  installing Python dependencies…"
 "$BACKEND_DIR/.venv/bin/pip" install --quiet -r "$BACKEND_DIR/requirements.txt"
+
+# Read ports from config.yml now that PyYAML is installed in the venv
+_ports=$("$BACKEND_DIR/.venv/bin/python" - "$SCRIPT_DIR/config.yml" <<'PYEOF' 2>/dev/null
+import sys, yaml
+try:
+    cfg = yaml.safe_load(open(sys.argv[1])) or {}
+    s = cfg.get("server", {})
+    print(s.get("backend_port", 8000), s.get("frontend_port", 3000))
+except Exception:
+    print("8000 3000")
+PYEOF
+)
+BACKEND_PORT=$(echo "$_ports" | awk '{print $1}')
+FRONTEND_PORT=$(echo "$_ports" | awk '{print $2}')
+info "  config: backend_port=${BACKEND_PORT}, frontend_port=${FRONTEND_PORT}"
 
 if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
   info "  installing Node dependencies…"

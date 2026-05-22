@@ -22,3 +22,7 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# SQL dump / migration files (keep checked-in schema definitions)
+*.dump.sql
+!dbschema/*.sql

@@ -107,12 +107,12 @@ the full architecture. With the lean V1 scope many components (GraphQL, Celery,
 Redis, Martin, DuckDB, CDN, PgBouncer) are deferred, so the threats targeting
 those components are also deferred. The threats below apply to the V1 stack.
 
-### Authentication And Authorization
+<!-- ### Authentication And Authorization
 
 V1 is a single-user, local-first application. There is no multi-user
 authentication or authorization in V1. Before any networked or multi-user
 deployment, OAuth2/OIDC and dataset-level ownership must be designed and
-implemented (threat model CT-01, CT-02).
+implemented (threat model CT-01, CT-02). -->
 
 ### Trust Boundaries
 
@@ -186,3 +186,9 @@ These controls become necessary when the corresponding infrastructure is added:
 ## Dashboard
 
 - Heatmap per compliance items mentioned in dataset/reference.md
+
+## User management
+- Multi user platform with RBAC access control
+- Administrator can create, update and delete users in the platform
+- Administrator can turn on/ off user sign up feature.
+- Minimum password length can be set by the administrator.
