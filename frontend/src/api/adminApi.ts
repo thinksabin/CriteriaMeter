@@ -68,9 +68,14 @@ interface GroupUpdatePayload {
 
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(BASE + path, {
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     ...init,
   })
+  if (res.status === 401) {
+    window.location.href = '/login'
+    return undefined as unknown as T
+  }
   if (!res.ok) {
     const body = await res.json().catch(() => ({}))
     throw new Error((body as { detail?: string }).detail ?? `HTTP ${res.status}`)
@@ -152,4 +157,7 @@ export const adminApi = {
 
   removeGroupMember: (groupId: number, userId: string): Promise<void> =>
     req(`/groups/${groupId}/members/${userId}`, { method: 'DELETE' }),
+
+  resetUserPassword: (userId: string): Promise<void> =>
+    req(`/users/${userId}/reset-password`, { method: 'POST' }),
 }

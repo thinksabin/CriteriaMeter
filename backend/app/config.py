@@ -47,7 +47,10 @@ SECRET_KEY: str = _get(
     "CRITERIAMETER_SECRET_KEY", "auth.secret_key", "dev-secret-key-change-in-production"
 )
 JWT_ALGORITHM: str = str(_yml("auth.algorithm", "HS256"))
-JWT_EXPIRE_HOURS: int = int(_yml("auth.token_expire_hours", 24))
+JWT_EXPIRE_MINUTES: int = int(_yml("auth.token_expire_minutes", 60))
+COOKIE_SECURE: bool = str(
+    _get("CRITERIAMETER_COOKIE_SECURE", "auth.cookie_secure", "false")
+).lower() in ("1", "true", "yes")
 
 # ── Server ─────────────────────────────────────────────────────────────────────
 _raw_origins = _get(

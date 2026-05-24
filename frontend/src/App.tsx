@@ -1,6 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import NavBar from './components/NavBar'
+import RequireAuth from './components/RequireAuth'
+import RequireAdmin from './components/RequireAdmin'
 import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import About from './pages/About'
@@ -9,6 +11,7 @@ import ComplianceChecklist from './pages/ComplianceChecklist'
 import Mapper from './pages/Mapper'
 import Login from './pages/Login'
 import SignUp from './pages/SignUp'
+import Settings from './pages/Settings'
 import UserManagement from './pages/admin/UserManagement'
 import Authentication from './pages/admin/Authentication'
 
@@ -20,15 +23,24 @@ function AppShell() {
         <main className="main">
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/meter-reading" element={<MeterReading />} />
-            <Route path="/meter-reading/supply-chain" element={<MeterReading />} />
-            <Route path="/meter-reading/compliance" element={<ComplianceChecklist />} />
+            <Route path="/meter-reading" element={<RequireAuth><MeterReading /></RequireAuth>} />
+            <Route path="/meter-reading/supply-chain" element={<RequireAuth><MeterReading /></RequireAuth>} />
+            <Route path="/meter-reading/compliance" element={<RequireAuth><ComplianceChecklist /></RequireAuth>} />
             <Route path="/mapper" element={<Mapper />} />
             <Route path="/mapper/:group" element={<Mapper />} />
-            <Route path="/admin/user-management" element={<UserManagement />} />
-            <Route path="/admin/authentication"  element={<Authentication />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
+            <Route path="/settings"  element={<RequireAuth><Settings /></RequireAuth>} />
             <Route path="/about" element={<About />} />
+
+            {/* Admin routes — require authentication + admin role */}
+            <Route
+              path="/admin/user-management"
+              element={<RequireAdmin><UserManagement /></RequireAdmin>}
+            />
+            <Route
+              path="/admin/authentication"
+              element={<RequireAdmin><Authentication /></RequireAdmin>}
+            />
           </Routes>
         </main>
         <footer className="footer">

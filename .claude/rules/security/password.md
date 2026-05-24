@@ -1,0 +1,9 @@
+# Password Security Rules
+- Passwords must be at least 8 characters long.
+- Password complexity will be based on the settings defined by the administrator, which may include requirements for uppercase letters, lowercase letters, numbers, and special characters.
+- Passwords should be hashed using a strong hashing algorithm (e.g., bcrypt, argon2) before being stored in the database.
+- Implement a password strength meter, in the password change form, to encourage users to create stronger passwords. Strength can be evaluated based on length, character variety, and common password patterns. Meter should provide real-time feedback to users as they create or change their passwords. Meter levels can be categorized as weak, medium, and strong, with corresponding visual indicators (e.g., color-coded bars or messages) to guide users in creating more secure passwords.
+- Password change form should require users to enter their current password for verification before allowing them to set a new password.
+- Password change form should be protected against CSRF attacks by implementing appropriate CSRF tokens and validation mechanisms.
+- Implement a password reset mechanism that allows users to securely reset their passwords if they forget them. This mechanism should include email verification and token-based password reset links that expire after a certain period of time. 
+- Password reset function should also be protected against CSRF attacks and can only be accessed by the admin through user management page. Password reset function should not be accessible to regular users or unauthenticated users. Password reset button should be in the Actions column of the user management page, and only visible to users with admin role. When admin clicks the password reset button, a password reset email should be sent to the user's registered email address with instructions on how to reset their password.

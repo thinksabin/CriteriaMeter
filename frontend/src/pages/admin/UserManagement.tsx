@@ -143,6 +143,13 @@ export default function UserManagement() {
     try { const up = await adminApi.toggleApiAccess(u.id); setUsers(prev => prev.map(x => x.id === up.id ? up : x)) }
     catch (e) { setPageError(e instanceof Error ? e.message : 'Toggle failed.') }
   }
+  async function handleResetPassword(u: AdminUser) {
+    if (!confirm(`Send a password reset email to ${u.email}?`)) return
+    try {
+      await adminApi.resetUserPassword(u.id)
+      alert(`Password reset email queued for ${u.email}.`)
+    } catch (e) { setPageError(e instanceof Error ? e.message : 'Reset failed.') }
+  }
 
   // ── Assign roles to user ──────────────────────────────────────────────────────
 
@@ -374,9 +381,10 @@ export default function UserManagement() {
                           </td>
                           <td className="um-td um-td-center">
                             <div className="um-actions">
-                              <button className="um-icon-btn" title="Edit user"         onClick={() => openEditUser(u)}>✎</button>
-                              <button className="um-icon-btn" title="Assign roles"      onClick={() => openAssignRoles(u)}>◑</button>
-                              <button className="um-icon-btn" title="Assign groups"     onClick={() => openAssignGroups(u)}>⊞</button>
+                              <button className="um-icon-btn" title="Edit user"           onClick={() => openEditUser(u)}>✎</button>
+                              <button className="um-icon-btn" title="Assign roles"        onClick={() => openAssignRoles(u)}>◑</button>
+                              <button className="um-icon-btn" title="Assign groups"       onClick={() => openAssignGroups(u)}>⊞</button>
+                              <button className="um-icon-btn" title="Reset password"      onClick={() => void handleResetPassword(u)}>⟳</button>
                               <button className="um-icon-btn um-icon-btn--danger" title="Delete user" onClick={() => void deleteUser(u)}>✕</button>
                             </div>
                           </td>

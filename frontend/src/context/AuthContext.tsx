@@ -1,48 +1,55 @@
-import { createContext, useContext, useState, type ReactNode } from 'react'
-import type { AuthUser } from '../api/authApi'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { authApi, type AuthUser } from '../api/authApi'
+
+function hasSessionCookie(): boolean {
+  return document.cookie.split(';').some(c => c.trim().startsWith('cm_present='))
+}
 
 interface AuthContextValue {
   user: AuthUser | null
-  token: string | null
   isAuthenticated: boolean
-  login: (token: string, user: AuthUser) => void
+  isAdmin: boolean
+  login: (user: AuthUser) => void
   logout: () => void
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
 
-function loadFromStorage(): { token: string | null; user: AuthUser | null } {
-  try {
-    const token = localStorage.getItem('cm_token')
-    const raw = localStorage.getItem('cm_user')
-    const user = raw ? (JSON.parse(raw) as AuthUser) : null
-    return { token, user }
-  } catch {
-    return { token: null, user: null }
-  }
-}
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const stored = loadFromStorage()
-  const [token, setToken] = useState<string | null>(stored.token)
-  const [user, setUser]   = useState<AuthUser | null>(stored.user)
+  const [user, setUser]       = useState<AuthUser | null>(null)
+  const [loading, setLoading] = useState(true)
 
-  function login(newToken: string, newUser: AuthUser) {
-    localStorage.setItem('cm_token', newToken)
-    localStorage.setItem('cm_user', JSON.stringify(newUser))
-    setToken(newToken)
+  useEffect(() => {
+    // Remove legacy localStorage tokens left from the pre-cookie implementation
+    localStorage.removeItem('cm_token')
+    localStorage.removeItem('cm_user')
+
+    if (!hasSessionCookie()) {
+      // No presence cookie → definitely not logged in; skip the network round-trip
+      setLoading(false)
+      return
+    }
+
+    authApi.me()
+      .then(u => setUser(u))
+      .catch(() => setUser(null))
+      .finally(() => setLoading(false))
+  }, [])
+
+  function login(newUser: AuthUser) {
     setUser(newUser)
   }
 
   function logout() {
-    localStorage.removeItem('cm_token')
-    localStorage.removeItem('cm_user')
-    setToken(null)
-    setUser(null)
+    authApi.logout().finally(() => setUser(null))
   }
 
+  const isAdmin = user?.roles.includes('admin') ?? false
+
+  if (loading) return null
+
   return (
-    <AuthContext.Provider value={{ user, token, isAuthenticated: !!token, login, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isAdmin, login, logout }}>
       {children}
     </AuthContext.Provider>
   )

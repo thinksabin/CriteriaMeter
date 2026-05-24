@@ -5,12 +5,7 @@ export interface AuthUser {
   email: string
   first_name: string
   last_name: string
-}
-
-export interface LoginResponse {
-  access_token: string
-  token_type: string
-  user: AuthUser
+  roles: string[]
 }
 
 interface SignupRequest {
@@ -26,23 +21,33 @@ interface LoginRequest {
   password: string
 }
 
-async function request<T>(path: string, body: unknown): Promise<T> {
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(BASE + path, {
-    method: 'POST',
+    credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    ...init,
   })
   if (!res.ok) {
     const data = await res.json().catch(() => ({}))
-    throw new Error(data?.detail ?? `HTTP ${res.status}`)
+    throw new Error((data as { detail?: string }).detail ?? `HTTP ${res.status}`)
   }
+  if (res.status === 204) return undefined as unknown as T
   return res.json() as Promise<T>
 }
 
 export const authApi = {
   signup: (data: SignupRequest): Promise<AuthUser> =>
-    request('/signup', data),
+    request('/signup', { method: 'POST', body: JSON.stringify(data) }),
 
-  login: (data: LoginRequest): Promise<LoginResponse> =>
-    request('/login', data),
+  login: (data: LoginRequest): Promise<AuthUser> =>
+    request('/login', { method: 'POST', body: JSON.stringify(data) }),
+
+  me: (): Promise<AuthUser> =>
+    request('/me', { method: 'GET' }),
+
+  logout: (): Promise<void> =>
+    request('/logout', { method: 'POST' }),
+
+  changePassword: (data: { current_password: string; new_password: string; confirm_password: string }): Promise<void> =>
+    request('/change-password', { method: 'POST', body: JSON.stringify(data) }),
 }

@@ -34,7 +34,7 @@ def run_migrations() -> None:
         for _name, _desc in [
             ("administrators", "Platform administrators"),
             ("staff",          "Internal staff members"),
-            ("api-clients",    "Service accounts with API access"),
+            ("apiclients",     "Service accounts with API access"),
         ]:
             conn.execute(
                 text(

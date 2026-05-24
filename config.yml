@@ -35,8 +35,12 @@ auth:
 
   algorithm: HS256
 
-  # JWT lifetime in hours
-  token_expire_hours: 24
+  # Session cookie lifetime in minutes (default: 60)
+  token_expire_minutes: 60
+
+  # Set to true in production (HTTPS). Keep false for local HTTP development.
+  # Override: CRITERIAMETER_COOKIE_SECURE
+  cookie_secure: false
 
 # ── Application ───────────────────────────────────────────────────────────────
 app:
