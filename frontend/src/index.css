@@ -1299,6 +1299,26 @@ body {
   text-overflow: ellipsis;
 }
 
+.nav-settings-link {
+  display: block;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  padding: 0.3rem 0.6rem;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: none;
+  transition: border-color 0.12s, color 0.12s;
+}
+
+.nav-settings-link:hover,
+.nav-settings-link.active {
+  border-color: var(--color-accent);
+  color: var(--color-text);
+}
+
 .nav-logout-btn {
   background: none;
   border: 1px solid var(--color-border);
@@ -1833,3 +1853,115 @@ body {
 
 .as-save-msg--ok  { color: #63ca9b; }
 .as-save-msg--err { color: #e05a5a; }
+
+/* ── Settings page ─────────────────────────────────────────────────────────── */
+
+.settings-page {
+  max-width: 520px;
+  padding: 2rem;
+}
+
+.settings-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem 2rem;
+  margin-top: 1.5rem;
+}
+
+.settings-card-title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--color-text);
+  margin: 0 0 0.25rem;
+}
+
+.settings-card-subtitle {
+  font-size: 0.84rem;
+  color: var(--color-text-muted);
+  margin: 0 0 1rem;
+}
+
+.settings-requirements {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.auth-alert--success {
+  background: rgba(99, 202, 155, 0.12);
+  border-color: rgba(99, 202, 155, 0.35);
+  color: #63ca9b;
+}
+
+/* ── Password strength meter ───────────────────────────────────────────────── */
+
+.pw-strength {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.pw-strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.pw-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.pw-bar--empty  { background: var(--color-border); }
+.pw-bar--weak   { background: #e05a5a; }
+.pw-bar--medium { background: #e0a030; }
+.pw-bar--strong { background: #63ca9b; }
+
+.pw-strength-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 3.5rem;
+  text-align: right;
+}
+
+.pw-strength-label--weak   { color: #e05a5a; }
+.pw-strength-label--medium { color: #e0a030; }
+.pw-strength-label--strong { color: #63ca9b; }
+
+/* ── Password visibility toggle ────────────────────────────────────────────── */
+
+.pw-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pw-input-wrap .pw-input {
+  flex: 1;
+  padding-right: 2.6rem;
+}
+
+.pw-toggle-btn {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.25rem;
+  color: var(--color-text-muted);
+  transition: color 0.12s;
+  user-select: none;
+}
+
+.pw-toggle-btn:hover { color: var(--color-text); }
+.pw-toggle-btn:disabled { cursor: not-allowed; opacity: 0.4; }

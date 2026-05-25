@@ -47,7 +47,10 @@ SECRET_KEY: str = _get(
     "CRITERIAMETER_SECRET_KEY", "auth.secret_key", "dev-secret-key-change-in-production"
 )
 JWT_ALGORITHM: str = str(_yml("auth.algorithm", "HS256"))
-JWT_EXPIRE_HOURS: int = int(_yml("auth.token_expire_hours", 24))
+JWT_EXPIRE_MINUTES: int = int(_yml("auth.token_expire_minutes", 60))
+COOKIE_SECURE: bool = str(
+    _get("CRITERIAMETER_COOKIE_SECURE", "auth.cookie_secure", "false")
+).lower() in ("1", "true", "yes")
 
 # ── Server ─────────────────────────────────────────────────────────────────────
 _raw_origins = _get(
@@ -67,3 +70,14 @@ BACKEND_PORT: int = int(
 LOG_LEVEL: str = str(
     _get("CRITERIAMETER_LOG_LEVEL", "app.log_level", "info")
 ).lower()
+
+# ── Seed data ──────────────────────────────────────────────────────────────────
+SEED_ADMIN_EMAIL: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_EMAIL", "seed.admin_user.email", "admin@admin.com")
+)
+SEED_ADMIN_PASSWORD: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_PASSWORD", "seed.admin_user.password", "admin123")
+)
+SEED_ADMIN_ROLE: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_ROLE", "seed.admin_user.role", "admin")
+)

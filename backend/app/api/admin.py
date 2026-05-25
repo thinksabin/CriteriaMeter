@@ -1,4 +1,6 @@
 import datetime
+import logging
+import secrets
 import uuid
 
 import bcrypt
@@ -9,10 +11,17 @@ from sqlalchemy.orm import Session, joinedload
 
 from app.auth_utils import AuthSettings, get_auth_settings
 from app.db import get_db
+from app.dependencies import require_admin
 from app.models.settings import AppSetting
-from app.models.user import Group, GroupRole, Role, User, UserGroup, UserRole
+from app.models.user import AuthToken, Group, GroupRole, Role, User, UserGroup, UserRole
 
-router = APIRouter(prefix="/api/admin", tags=["admin"])
+logger = logging.getLogger(__name__)
+
+router = APIRouter(
+    prefix="/api/admin",
+    tags=["admin"],
+    dependencies=[Depends(require_admin)],
+)
 
 
 def _now() -> str:
@@ -548,3 +557,43 @@ def update_auth_settings(body: AuthSettingsPatch, db: Session = Depends(get_db))
     db.commit()
 
     return _settings_to_out(get_auth_settings(db))
+
+
+# ── Password reset (admin-initiated) ──────────────────────────────────────────
+
+@router.post("/users/{uid}/reset-password", status_code=status.HTTP_204_NO_CONTENT)
+def admin_reset_password(uid: str, db: Session = Depends(get_db)) -> None:
+    user = db.get(User, uid)
+    if not user:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "User not found.")
+
+    # Expire any outstanding reset tokens for this user
+    db.query(AuthToken).filter(
+        AuthToken.user_id == uid,
+        AuthToken.purpose == "password_reset",
+        AuthToken.consumed_at.is_(None),
+    ).update({"consumed_at": _now()})
+
+    raw_token = secrets.token_urlsafe(32)
+    token_hash = bcrypt.hashpw(raw_token.encode(), bcrypt.gensalt()).decode()
+    expires_at = (
+        datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+    ).strftime("%Y-%m-%dT%H:%M:%S.000Z")
+
+    db.add(AuthToken(
+        id=str(uuid.uuid4()),
+        user_id=uid,
+        purpose="password_reset",
+        token_hash=token_hash,
+        created_at=_now(),
+        expires_at=expires_at,
+    ))
+    db.commit()
+
+    # TODO: send reset email to user.email with the raw_token link once an
+    # email service is configured (CRITERIAMETER_SMTP_* env vars).
+    logger.info(
+        "Password reset token generated for user %s (email: %s). "
+        "Configure SMTP to deliver reset emails.",
+        uid, user.email,
+    )

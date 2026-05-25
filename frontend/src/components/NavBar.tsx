@@ -7,10 +7,7 @@ const TOP_LINKS = [
   { to: '/', label: 'Home', icon: '⌂' },
 ]
 
-const BOTTOM_LINKS = [
-  { to: '/dashboard', label: 'Dashboard', icon: '◈' },
-  { to: '/about',     label: 'About',     icon: '◉' },
-]
+const ABOUT_LINK = { to: '/about', label: 'About', icon: '◉' }
 
 const METER_CHILDREN = [
   { to: '/meter-reading/supply-chain', label: 'Supply Chain' },
@@ -30,7 +27,7 @@ const ADMIN_CHILDREN = [
 export default function NavBar() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { isAuthenticated, user, logout } = useAuth()
+  const { isAuthenticated, isAdmin, user, logout } = useAuth()
 
   const onMeter  = location.pathname.startsWith('/meter-reading')
   const onMapper = location.pathname.startsWith('/mapper')
@@ -69,31 +66,33 @@ export default function NavBar() {
           </li>
         ))}
 
-        {/* Expandable Meter Reading group */}
-        <li>
-          <button
-            className={`nav-link nav-group-btn${onMeter ? ' nav-link--active' : ''}`}
-            onClick={() => setMeterOpen(o => !o)}
-            aria-expanded={meterOpen}
-          >
-            <span className="nav-icon">⊡</span>
-            <span>Meter Reading</span>
-            <span className="nav-chevron">{meterOpen ? '▾' : '▸'}</span>
-          </button>
+        {/* Meter Reading — authenticated users only */}
+        {isAuthenticated && (
+          <li>
+            <button
+              className={`nav-link nav-group-btn${onMeter ? ' nav-link--active' : ''}`}
+              onClick={() => setMeterOpen(o => !o)}
+              aria-expanded={meterOpen}
+            >
+              <span className="nav-icon">⊡</span>
+              <span>Meter Reading</span>
+              <span className="nav-chevron">{meterOpen ? '▾' : '▸'}</span>
+            </button>
 
-          {meterOpen && (
-            <ul className="nav-sub-list">
-              {METER_CHILDREN.map(({ to, label }) => (
-                <li key={to}>
-                  <NavLink to={to} className={navLinkClass}>
-                    <span className="nav-sub-bullet">–</span>
-                    <span>{label}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
+            {meterOpen && (
+              <ul className="nav-sub-list">
+                {METER_CHILDREN.map(({ to, label }) => (
+                  <li key={to}>
+                    <NavLink to={to} className={navLinkClass}>
+                      <span className="nav-sub-bullet">–</span>
+                      <span>{label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        )}
 
         {/* Expandable Mapper group */}
         <li>
@@ -121,46 +120,58 @@ export default function NavBar() {
           )}
         </li>
 
-        {/* Expandable Administration group */}
-        <li>
-          <button
-            className={`nav-link nav-group-btn${onAdmin ? ' nav-link--active' : ''}`}
-            onClick={() => setAdminOpen(o => !o)}
-            aria-expanded={adminOpen}
-          >
-            <span className="nav-icon">⚙</span>
-            <span>Administration</span>
-            <span className="nav-chevron">{adminOpen ? '▾' : '▸'}</span>
-          </button>
+        {/* Administration — only visible to admin users */}
+        {isAdmin && (
+          <li>
+            <button
+              className={`nav-link nav-group-btn${onAdmin ? ' nav-link--active' : ''}`}
+              onClick={() => setAdminOpen(o => !o)}
+              aria-expanded={adminOpen}
+            >
+              <span className="nav-icon">⚙</span>
+              <span>Administration</span>
+              <span className="nav-chevron">{adminOpen ? '▾' : '▸'}</span>
+            </button>
 
-          {adminOpen && (
-            <ul className="nav-sub-list">
-              {ADMIN_CHILDREN.map(({ to, label }) => (
-                <li key={to}>
-                  <NavLink to={to} className={navLinkClass}>
-                    <span className="nav-sub-bullet">–</span>
-                    <span>{label}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          )}
-        </li>
+            {adminOpen && (
+              <ul className="nav-sub-list">
+                {ADMIN_CHILDREN.map(({ to, label }) => (
+                  <li key={to}>
+                    <NavLink to={to} className={navLinkClass}>
+                      <span className="nav-sub-bullet">–</span>
+                      <span>{label}</span>
+                    </NavLink>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </li>
+        )}
 
-        {BOTTOM_LINKS.map(({ to, label, icon }) => (
-          <li key={to}>
-            <NavLink to={to} className={navLinkClass}>
-              <span className="nav-icon">{icon}</span>
-              <span>{label}</span>
+        {/* Dashboard — authenticated users only */}
+        {isAuthenticated && (
+          <li>
+            <NavLink to="/dashboard" className={navLinkClass}>
+              <span className="nav-icon">◈</span>
+              <span>Dashboard</span>
             </NavLink>
           </li>
-        ))}
+        )}
+
+        {/* About — always visible */}
+        <li>
+          <NavLink to={ABOUT_LINK.to} className={navLinkClass}>
+            <span className="nav-icon">{ABOUT_LINK.icon}</span>
+            <span>{ABOUT_LINK.label}</span>
+          </NavLink>
+        </li>
       </ul>
 
       <div className="sidebar-footer">
         {isAuthenticated && user ? (
           <div className="nav-user">
             <span className="nav-user-name">{user.first_name} {user.last_name}</span>
+            <NavLink to="/settings" className="nav-settings-link">Settings</NavLink>
             <button className="nav-logout-btn" onClick={handleLogout}>Log out</button>
           </div>
         ) : (

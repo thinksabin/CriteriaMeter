@@ -1,11 +1,13 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { authApi } from '../api/authApi'
 import { useAuth } from '../context/AuthContext'
 
 export default function Login() {
   const { login } = useAuth()
   const navigate   = useNavigate()
+  const location   = useLocation()
+  const from       = (location.state as { from?: Location } | null)?.from?.pathname ?? '/'
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
@@ -17,9 +19,9 @@ export default function Login() {
     setError(null)
     setLoading(true)
     try {
-      const res = await authApi.login({ email: email.trim(), password })
-      login(res.access_token, res.user)
-      navigate('/')
+      const user = await authApi.login({ email: email.trim(), password })
+      login(user)
+      navigate(from, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed.')
     } finally {
