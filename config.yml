@@ -48,3 +48,13 @@ app:
   version: "0.1.0"
   # Log level: debug | info | warning | error
   log_level: info
+
+# ── Seed data ─────────────────────────────────────────────────────────────────
+# Default admin account created on first startup (INSERT OR IGNORE — idempotent).
+# Override credentials via CRITERIAMETER_SEED_ADMIN_EMAIL / _PASSWORD env vars.
+# Change the password via the Settings page after first login.
+seed:
+  admin_user:
+    email: admin@admin.com
+    password: admin123
+    role: admin

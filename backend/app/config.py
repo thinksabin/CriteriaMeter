@@ -70,3 +70,14 @@ BACKEND_PORT: int = int(
 LOG_LEVEL: str = str(
     _get("CRITERIAMETER_LOG_LEVEL", "app.log_level", "info")
 ).lower()
+
+# ── Seed data ──────────────────────────────────────────────────────────────────
+SEED_ADMIN_EMAIL: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_EMAIL", "seed.admin_user.email", "admin@admin.com")
+)
+SEED_ADMIN_PASSWORD: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_PASSWORD", "seed.admin_user.password", "admin123")
+)
+SEED_ADMIN_ROLE: str = str(
+    _get("CRITERIAMETER_SEED_ADMIN_ROLE", "seed.admin_user.role", "admin")
+)

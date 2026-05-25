@@ -1,0 +1,36 @@
+services:
+
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      CRITERIAMETER_DATABASE_URL:    sqlite:////data/criteriameter.db
+      CRITERIAMETER_SECRET_KEY:      ${CRITERIAMETER_SECRET_KEY:-dev-secret-key-change-in-production}
+      CRITERIAMETER_ALLOWED_ORIGINS: http://localhost:3000
+      CRITERIAMETER_COOKIE_SECURE:   "false"
+      CRITERIAMETER_LOG_LEVEL:       info
+    volumes:
+      - cm_data:/data
+      - ./dataset:/app/dataset:ro
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  cm_data:
+    driver: local
